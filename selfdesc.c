@@ -66,8 +66,8 @@ void selfdesc(int pos, int inds_sum, int inds_val, int delta) {
 			}
 			nums[i]++;
 			inds[pos] = i;
-			if (delta+inds[pos]-nums[pos] <= pos) {
-				selfdesc(pos-1, inds_sum-i, inds_val-i*pos, delta+inds[pos]-nums[pos]);
+			if (delta+i-nums[pos] <= pos) {
+				selfdesc(pos-1, inds_sum-i, inds_val-i*pos, delta+i-nums[pos]);
 			}
 			nums[i]--;
 			if (i > pos) {
