@@ -44,29 +44,20 @@ int main(int argc, char *argv[]) {
 void selfdesc(int pos, int inds_sum, int inds_val, int delta) {
 	int i;
 	if (pos >= 0) {
-		int lower = nums[pos], upper_min, upper;
+		int lower = nums[pos], upper;
 		if (lower == pos) {
 			lower++;
 		}
 		if (pos > 0) {
-			upper_min = inds_val/pos;
+			upper = inds_val/pos;
 		}
 		else {
-			if (lower < inds_sum) {
-				lower = inds_sum;
-			}
-			upper_min = inds_sum;
-		}
-		if (inds_sum < base) {
 			upper = inds_sum;
 		}
-		else {
-			upper = base-1;
+		if (upper == base) {
+			upper--;
 		}
-		if (upper < upper_min) {
-			upper_min = upper;
-		}
-		for (i = lower; i <= upper_min; i++) {
+		for (i = lower; i <= upper; i++) {
 			if (i > pos) {
 				if (nums[i] >= inds[i]) {
 					continue;
