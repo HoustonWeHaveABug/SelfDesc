@@ -5,7 +5,7 @@
 
 void selfdesc(int, int, int, int);
 
-int *nums, *inds, base;
+int *nums, *inds, base, cost;
 
 int main(int argc, char *argv[]) {
 	int base_max;
@@ -34,44 +34,53 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 	for (base = BASE_MIN; base <= base_max; base++) {
+		cost = 0;
 		selfdesc(base-1, base, base, 0);
+		printf("Cost %d\n", cost);
+		fflush(stdout);
 	}
 	free(inds);
 	free(nums);
 	return EXIT_SUCCESS;
 }
 
-void selfdesc(int pos, int inds_sum, int inds_val, int delta) {
+void selfdesc(int pos, int inds_sum, int inds_val, int delta_sum) {
 	int i;
+	cost++;
 	if (pos >= 0) {
 		int lower = nums[pos], upper;
 		if (lower == pos) {
 			lower++;
 		}
 		if (pos > 0) {
-			upper = inds_val/pos;
+			upper = (inds_val+nums[pos]*pos)/pos;
 		}
 		else {
-			upper = inds_sum;
-		}
-		if (upper == base) {
-			upper--;
+			upper = inds_sum%base;
 		}
 		for (i = lower; i <= upper; i++) {
+			int delta;
 			if (i > pos) {
-				if (nums[i] >= inds[i]) {
+				if (nums[i] == inds[i]) {
 					continue;
 				}
-				delta--;
+				delta_sum--;
+			}
+			else if (i < pos) {
+				inds_val -= i;
 			}
 			nums[i]++;
-			inds[pos] = i;
-			if (delta+i-nums[pos] <= pos) {
-				selfdesc(pos-1, inds_sum-i, inds_val-i*pos, delta+i-nums[pos]);
+			delta = i-nums[pos];
+			if (delta_sum+delta <= pos) {
+				inds[pos] = i;
+				selfdesc(pos-1, inds_sum-i, inds_val-delta*pos, delta_sum+delta);
 			}
 			nums[i]--;
 			if (i > pos) {
-				delta++;
+				delta_sum++;
+			}
+			else if (i < pos) {
+				inds_val += i;
 			}
 		}
 		return;
