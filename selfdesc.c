@@ -4,6 +4,7 @@
 #define BASE_MIN 2
 
 void selfdesc(int, int, int, int);
+void choose_val(int, int, int, int, int);
 
 int *nums, *inds, base, cost;
 
@@ -56,32 +57,23 @@ void selfdesc(int pos, int inds_sum, int inds_val, int delta_sum) {
 			upper = (inds_val+nums[pos]*pos)/pos;
 		}
 		else {
-			upper = inds_sum%base;
+			upper = inds_sum;
 		}
-		for (i = lower; i <= upper; i++) {
-			int delta;
-			if (i > pos) {
-				if (nums[i] == inds[i]) {
-					continue;
-				}
-				delta_sum--;
+		if (upper == base) {
+			upper--;
+		}
+		for (i = lower; i <= upper && i < pos; i++) {
+			choose_val(pos, inds_sum, inds_val-i, delta_sum, i);
+		}
+		if (i <= upper && i == pos) {
+			choose_val(pos, inds_sum, inds_val, delta_sum, i);
+			i++;
+		}
+		for (; i <= upper; i++) {
+			if (nums[i] == inds[i]) {
+				continue;
 			}
-			else if (i < pos) {
-				inds_val -= i;
-			}
-			nums[i]++;
-			delta = i-nums[pos];
-			if (delta_sum+delta <= pos) {
-				inds[pos] = i;
-				selfdesc(pos-1, inds_sum-i, inds_val-delta*pos, delta_sum+delta);
-			}
-			nums[i]--;
-			if (i > pos) {
-				delta_sum++;
-			}
-			else if (i < pos) {
-				inds_val += i;
-			}
+			choose_val(pos, inds_sum, inds_val, delta_sum-1, i);
 		}
 		return;
 	}
@@ -91,4 +83,15 @@ void selfdesc(int pos, int inds_sum, int inds_val, int delta_sum) {
 	}
 	puts(" ]");
 	fflush(stdout);
+}
+
+void choose_val(int pos, int inds_sum, int inds_val, int delta_sum, int val) {
+	int delta;
+	nums[val]++;
+	delta = val-nums[pos];
+	if (delta_sum+delta <= pos) {
+		inds[pos] = val;
+		selfdesc(pos-1, inds_sum-val, inds_val-delta*pos, delta_sum+delta);
+	}
+	nums[val]--;
 }
