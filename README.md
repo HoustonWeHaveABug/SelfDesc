@@ -23,6 +23,6 @@ The program takes advantage of the below constraints to find self descriptive nu
 - The number of non-zero digits at positions \[ 1 ... *b*-1 \] equals their sum - 1 (3 in the above example);
 - The sum of the product of its digits and their respective position is also *b* (6\*0 + 2\*1 + 1\*2 + 1\*6 = 10 in the above example).
 
-The search starts at position *b*-1 and ends at position 0. At each position, the program checks that it is still possible to generate a self-descriptive number, given the digits already selected.
+The search starts at position *b*-1 and ends at position 0. At each position, the program checks if it is still possible to generate a self-descriptive number, given the digits already selected.
 
-It takes 0,6 seconds on my computer to find all self-descriptive numbers from base 2 to 100.
+It takes 0,5 seconds on my computer to find all self-descriptive numbers from base 2 to 100.
