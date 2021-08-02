@@ -3,8 +3,8 @@
 
 #define BASE_MIN 2
 
-void selfdesc(int, int, int, int);
-void choose_val(int, int, int, int, int);
+void selfdesc(int, int, int, int, int);
+void choose_val(int, int, int, int, int, int);
 
 int *nums, *inds, base, cost;
 
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 	}
 	for (base = BASE_MIN; base <= base_max; base++) {
 		cost = 0;
-		selfdesc(base-1, base, base, 0);
+		selfdesc(base-1, base, base, base, 0);
 		printf("Cost %d\n", cost);
 		fflush(stdout);
 	}
@@ -45,35 +45,38 @@ int main(int argc, char *argv[]) {
 	return EXIT_SUCCESS;
 }
 
-void selfdesc(int pos, int inds_sum, int inds_val, int delta_sum) {
+void selfdesc(int pos, int inds_sum, int inds_not0, int inds_val, int delta_sum) {
 	int i;
 	cost++;
 	if (pos >= 0) {
-		int lower = nums[pos], upper;
+		int lower = nums[pos], upper1, upper2;
 		if (lower == pos) {
 			lower++;
 		}
 		if (pos > 0) {
-			upper = (inds_val+nums[pos]*pos)/pos;
+			upper1 = inds_sum-inds_not0+2;
+			upper2 = (inds_val+nums[pos]*pos)/pos;
+			if (upper2 < upper1) {
+				upper1 = upper2;
+			}
 		}
 		else {
-			upper = inds_sum;
+			upper1 = inds_sum;
 		}
-		if (upper == base) {
-			upper--;
+		if (upper1 == base) {
+			upper1--;
 		}
-		for (i = lower; i <= upper && i < pos; i++) {
-			choose_val(pos, inds_sum, inds_val-i, delta_sum, i);
+		for (i = lower; i <= upper1 && i < pos; i++) {
+			choose_val(pos, inds_sum, inds_not0, inds_val-i, delta_sum, i);
 		}
-		if (i <= upper && i == pos) {
-			choose_val(pos, inds_sum, inds_val, delta_sum, i);
+		if (i <= upper1 && i == pos) {
+			choose_val(pos, inds_sum, inds_not0, inds_val, delta_sum, i);
 			i++;
 		}
-		for (; i <= upper; i++) {
-			if (nums[i] == inds[i]) {
-				continue;
+		for (; i <= upper1; i++) {
+			if (nums[i] < inds[i]) {
+				choose_val(pos, inds_sum, inds_not0, inds_val, delta_sum-1, i);
 			}
-			choose_val(pos, inds_sum, inds_val, delta_sum-1, i);
 		}
 		return;
 	}
@@ -85,13 +88,13 @@ void selfdesc(int pos, int inds_sum, int inds_val, int delta_sum) {
 	fflush(stdout);
 }
 
-void choose_val(int pos, int inds_sum, int inds_val, int delta_sum, int val) {
+void choose_val(int pos, int inds_sum, int inds_not0, int inds_val, int delta_sum, int val) {
 	int delta;
 	nums[val]++;
 	delta = val-nums[pos];
 	if (delta_sum+delta <= pos) {
 		inds[pos] = val;
-		selfdesc(pos-1, inds_sum-val, inds_val-delta*pos, delta_sum+delta);
+		selfdesc(pos-1, inds_sum-val, inds_not0-(val > 0), inds_val-delta*pos, delta_sum+delta);
 	}
 	nums[val]--;
 }
