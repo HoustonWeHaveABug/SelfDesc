@@ -19,8 +19,9 @@ For example, in base 10, the number 6210001000 is self-descriptive because of th
 - It contains 0 at position 9, indicating that there is no 9 in 6210001000.
 
 The program takes advantage of the below constraints to find self descriptive number faster:
-- The sum of its digits is *b* (6+2+1+1 = 10 for the above example);
-- The sum of the product of its digits and their respective position is also *b* (6\*0 + 2\*1 + 1\*2 + 1\*6 = 10 for the above example).
+- The sum of its digits is *b* (6+2+1+1 = 10 in the above example);
+- The number of non-zero digits at positions \[ 1 ... *b*-1 \] equals their sum - 1 (3 in the above example);
+- The sum of the product of its digits and their respective position is also *b* (6\*0 + 2\*1 + 1\*2 + 1\*6 = 10 in the above example).
 
 The search starts at position *b*-1 and ends at position 0. At each position, the program checks that it is still possible to generate a self-descriptive number, given the digits already selected.
 
