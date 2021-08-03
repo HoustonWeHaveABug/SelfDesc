@@ -4,19 +4,24 @@
 #define BASE_MIN 2
 
 void selfdesc(int, int, int, int, int);
-void choose_val(int, int, int, int, int, int);
 
 int *nums, *inds, base, cost;
 
 int main(int argc, char *argv[]) {
-	int base_max;
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <base_max>\n", argv[0]);
+	int base_min, base_max;
+	if (argc != 3) {
+		fprintf(stderr, "Usage: %s base_min base_max\n", argv[0]);
 		fflush(stderr);
 		return EXIT_FAILURE;
 	}
-	base_max = atoi(argv[1]);
-	if (base_max < BASE_MIN) {
+	base_min = atoi(argv[1]);
+	if (base_min < BASE_MIN) {
+		fprintf(stderr, "Invalid base_min\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
+	base_max = atoi(argv[2]);
+	if (base_max < base_min) {
 		fprintf(stderr, "Invalid base_max\n");
 		fflush(stderr);
 		return EXIT_FAILURE;
@@ -34,7 +39,7 @@ int main(int argc, char *argv[]) {
 		free(nums);
 		return EXIT_FAILURE;
 	}
-	for (base = BASE_MIN; base <= base_max; base++) {
+	for (base = base_min; base <= base_max; base++) {
 		cost = 0;
 		selfdesc(base-1, base, base, base, 0);
 		printf("Cost %d\n", cost);
@@ -49,33 +54,78 @@ void selfdesc(int pos, int inds_sum, int inds_not0, int inds_val, int delta_sum)
 	int i;
 	cost++;
 	if (pos >= 0) {
-		int lower = nums[pos], upper1, upper2;
+		int lower = nums[pos], upper, upper_alt, delta;
 		if (lower == pos) {
 			lower++;
 		}
 		if (pos > 0) {
-			upper1 = inds_sum-inds_not0+2;
-			upper2 = (inds_val+nums[pos]*pos)/pos;
-			if (upper2 < upper1) {
-				upper1 = upper2;
+			upper = inds_sum-inds_not0+2;
+			upper_alt = (inds_val+nums[pos]*pos)/pos;
+			if (upper_alt < upper) {
+				upper = upper_alt;
 			}
 		}
 		else {
-			upper1 = inds_sum;
+			upper = inds_sum;
 		}
-		if (upper1 == base) {
-			upper1--;
+		if (upper == base) {
+			upper--;
 		}
-		for (i = lower; i <= upper1 && i < pos; i++) {
-			choose_val(pos, inds_sum, inds_not0, inds_val-i, delta_sum, i);
+		if (pos >= lower && pos <= upper) {
+			for (i = lower; i < pos; i++) {
+				delta = i-nums[pos];
+				if (delta_sum+delta > pos || inds_val-i < delta*pos) {
+					break;
+				}
+				nums[i]++;
+				inds[pos] = i;
+				selfdesc(pos-1, inds_sum-i, inds_not0-(i > 0), inds_val-i-delta*pos, delta_sum+delta);
+				nums[i]--;
+			}
+			delta = pos-nums[pos];
+			if (delta_sum-1+delta <= pos) {
+				nums[pos]++;
+				inds[pos] = pos;
+				selfdesc(pos-1, inds_sum-pos, inds_not0-(pos > 0), inds_val-delta*pos, delta_sum-1+delta);
+				nums[i]--;
+			}
+			for (i = pos+1; i <= upper; i++) {
+				delta = i-nums[pos];
+				if (delta_sum-1+delta > pos) {
+					break;
+				}
+				if (nums[i] < inds[i]) {
+					nums[i]++;
+					inds[pos] = i;
+					selfdesc(pos-1, inds_sum-i, inds_not0-(i > 0), inds_val-delta*pos, delta_sum-1+delta);
+					nums[i]--;
+				}
+			}
 		}
-		if (i <= upper1 && i == pos) {
-			choose_val(pos, inds_sum, inds_not0, inds_val, delta_sum, i);
-			i++;
+		else if (pos < lower) {
+			for (i = lower; i <= upper; i++) {
+				delta = i-nums[pos];
+				if (delta_sum-1+delta > pos) {
+					break;
+				}
+				if (nums[i] < inds[i]) {
+					nums[i]++;
+					inds[pos] = i;
+					selfdesc(pos-1, inds_sum-i, inds_not0-(i > 0), inds_val-delta*pos, delta_sum-1+delta);
+					nums[i]--;
+				}
+			}
 		}
-		for (; i <= upper1; i++) {
-			if (nums[i] < inds[i]) {
-				choose_val(pos, inds_sum, inds_not0, inds_val, delta_sum-1, i);
+		else {
+			for (i = lower; i <= upper; i++) {
+				delta = i-nums[pos];
+				if (delta_sum+delta > pos || inds_val-i < delta*pos) {
+					break;
+				}
+				nums[i]++;
+				inds[pos] = i;
+				selfdesc(pos-1, inds_sum-i, inds_not0-(i > 0), inds_val-i-delta*pos, delta_sum+delta);
+				nums[i]--;
 			}
 		}
 		return;
@@ -86,15 +136,4 @@ void selfdesc(int pos, int inds_sum, int inds_not0, int inds_val, int delta_sum)
 	}
 	puts(" ]");
 	fflush(stdout);
-}
-
-void choose_val(int pos, int inds_sum, int inds_not0, int inds_val, int delta_sum, int val) {
-	int delta;
-	nums[val]++;
-	delta = val-nums[pos];
-	if (delta_sum+delta <= pos) {
-		inds[pos] = val;
-		selfdesc(pos-1, inds_sum-val, inds_not0-(val > 0), inds_val-delta*pos, delta_sum+delta);
-	}
-	nums[val]--;
 }
