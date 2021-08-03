@@ -1,6 +1,6 @@
 # SelfDesc
 
-This program finds all self-descriptive numbers from base 2 to the base given as argument.
+This program finds all self-descriptive numbers from minimum base to maximum base given as arguments.
 
 A self-descriptive number is an integer *m* which in a given base *b* is *b* digits long. Each digit *d* at position *p* counts how many instances of digits *p* are in *m*. The most significant digit is at position 0 and the least significant digit is at position b-1.
 
@@ -25,4 +25,4 @@ The program takes advantage of the below constraints to find self descriptive nu
 
 The search starts at position *b*-1 and ends at position 0. At each position, the program checks if it is still possible to generate a self-descriptive number, given the digits already selected.
 
-It takes 0,5 seconds on my computer to find all self-descriptive numbers from base 2 to 100.
+It takes 0,4 seconds on my computer to find all self-descriptive numbers from base 2 to 100.
