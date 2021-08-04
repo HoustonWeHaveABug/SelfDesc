@@ -64,6 +64,7 @@ void selfdesc(int pos, int target_sum, int target_val, int delta_sum) {
 		}
 		else {
 			upper = target_sum;
+			upper_alt = target_sum;
 		}
 		if (upper == base) {
 			upper--;
@@ -74,10 +75,12 @@ void selfdesc(int pos, int target_sum, int target_val, int delta_sum) {
 				if (target_val-i < delta*pos || delta_sum+delta > pos) {
 					break;
 				}
-				nums[i]++;
-				inds[pos] = i;
-				selfdesc(pos-1, target_sum-i, target_val-i-delta*pos, delta_sum+delta);
-				nums[i]--;
+				if (i == 0 || nums[i] < upper_alt) {
+					nums[i]++;
+					inds[pos] = i;
+					selfdesc(pos-1, target_sum-i, target_val-i-delta*pos, delta_sum+delta);
+					nums[i]--;
+				}
 			}
 		}
 		else if (pos >= lower && pos <= upper) {
@@ -86,10 +89,12 @@ void selfdesc(int pos, int target_sum, int target_val, int delta_sum) {
 				if (target_val-i < delta*pos || delta_sum+delta > pos) {
 					break;
 				}
-				nums[i]++;
-				inds[pos] = i;
-				selfdesc(pos-1, target_sum-i, target_val-i-delta*pos, delta_sum+delta);
-				nums[i]--;
+				if (i == 0 || nums[i] < upper_alt) {
+					nums[i]++;
+					inds[pos] = i;
+					selfdesc(pos-1, target_sum-i, target_val-i-delta*pos, delta_sum+delta);
+					nums[i]--;
+				}
 			}
 			delta_sum--;
 			delta = pos-nums[pos];
