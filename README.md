@@ -25,4 +25,4 @@ The program takes advantage of the below constraints to find self descriptive nu
 
 The search starts at position *b*-1 and ends at position 0. At each position, the program checks if it is still possible to generate a self-descriptive number, given the digits already selected.
 
-It takes 0.3 seconds on my computer to find all self-descriptive numbers from base 2 to 100.
+It takes 1.2 seconds on my computer to find all self-descriptive numbers from base 2 to 200.
