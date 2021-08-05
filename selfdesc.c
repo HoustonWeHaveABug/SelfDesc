@@ -75,7 +75,7 @@ void selfdesc(int pos, int target_sum, int target_val, int delta_sum) {
 				if (target_val-i < delta*pos || delta_sum+delta > pos) {
 					break;
 				}
-				if (i == 0 || nums[i] < upper_alt) {
+				if (i == 0 || nums[i] <= upper_alt-i) {
 					nums[i]++;
 					inds[pos] = i;
 					selfdesc(pos-1, target_sum-i, target_val-i-delta*pos, delta_sum+delta);
@@ -89,7 +89,7 @@ void selfdesc(int pos, int target_sum, int target_val, int delta_sum) {
 				if (target_val-i < delta*pos || delta_sum+delta > pos) {
 					break;
 				}
-				if (i == 0 || nums[i] < upper_alt) {
+				if (i == 0 || nums[i] <= upper_alt-i) {
 					nums[i]++;
 					inds[pos] = i;
 					selfdesc(pos-1, target_sum-i, target_val-i-delta*pos, delta_sum+delta);
@@ -98,22 +98,24 @@ void selfdesc(int pos, int target_sum, int target_val, int delta_sum) {
 			}
 			delta_sum--;
 			delta = pos-nums[pos];
-			if (delta_sum+delta <= pos && nums[pos] < pos) {
-				nums[pos]++;
-				inds[pos] = pos;
-				selfdesc(pos-1, target_sum-pos, target_val-delta*pos, delta_sum+delta);
-				nums[pos]--;
-			}
-			for (i = pos+1; i <= upper; i++) {
-				delta = i-nums[pos];
-				if (delta_sum+delta > pos) {
-					break;
+			if (delta_sum+delta <= pos) {
+				if (nums[pos] < pos) {
+					nums[pos]++;
+					inds[pos] = pos;
+					selfdesc(pos-1, target_sum-pos, target_val-delta*pos, delta_sum+delta);
+					nums[pos]--;
 				}
-				if (nums[i] < inds[i]) {
-					nums[i]++;
-					inds[pos] = i;
-					selfdesc(pos-1, target_sum-i, target_val-delta*pos, delta_sum+delta);
-					nums[i]--;
+				for (i = pos+1; i <= upper; i++) {
+					delta = i-nums[pos];
+					if (delta_sum+delta > pos) {
+						break;
+					}
+					if (nums[i] < inds[i]) {
+						nums[i]++;
+						inds[pos] = i;
+						selfdesc(pos-1, target_sum-i, target_val-delta*pos, delta_sum+delta);
+						nums[i]--;
+					}
 				}
 			}
 		}
