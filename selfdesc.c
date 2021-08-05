@@ -3,9 +3,10 @@
 
 #define BASE_MIN 2
 
-void selfdesc(int, int, int, int);
+void selfdesc(int, int, int);
+void choose_ind(int, int, int, int, int);
 
-int *nums, *inds, base, cost;
+int *nums, *inds, base;
 
 int main(int argc, char *argv[]) {
 	int base_min, base_max;
@@ -40,22 +41,29 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 	for (base = base_min; base <= base_max; base++) {
-		cost = 0;
-		selfdesc(base-1, base, base, 0);
-		printf("Cost %d\n", cost);
-		fflush(stdout);
+		selfdesc(base-1, base, base);
 	}
 	free(inds);
 	free(nums);
 	return EXIT_SUCCESS;
 }
 
-void selfdesc(int pos, int target_sum, int target_val, int delta_sum) {
+void selfdesc(int pos, int target_sum, int target_val) {
 	int i;
-	cost++;
 	if (pos >= 0) {
-		int lower = nums[pos], upper, upper_alt, delta;
+		int zeros = nums[0], lower = nums[pos], upper, upper_alt;
 		if (pos > 0) {
+			if (target_sum < base) {
+				while (pos > 2) {
+					nums[0]++;
+					inds[pos--] = 0;
+				}
+			}
+			else {
+				if (pos < base-3 && lower == 0) {
+					lower++;
+				}
+			}
 			upper = target_val/pos+nums[pos];
 			upper_alt = target_sum-nums[0]-pos+1;
 			if (upper_alt < upper) {
@@ -64,76 +72,44 @@ void selfdesc(int pos, int target_sum, int target_val, int delta_sum) {
 		}
 		else {
 			upper = target_sum;
-			upper_alt = target_sum;
 		}
 		if (upper == base) {
 			upper--;
 		}
 		if (pos > upper) {
 			for (i = lower; i <= upper; i++) {
-				delta = i-nums[pos];
-				if (target_val-i < delta*pos || delta_sum+delta > pos) {
+				int delta = i+(i-nums[pos])*pos;
+				if (target_val < delta) {
 					break;
 				}
-				if (i == 0 || nums[i] <= upper_alt-i) {
-					nums[i]++;
-					inds[pos] = i;
-					selfdesc(pos-1, target_sum-i, target_val-i-delta*pos, delta_sum+delta);
-					nums[i]--;
-				}
+				choose_ind(pos, target_sum, target_val, i, delta);
 			}
 		}
 		else if (pos >= lower && pos <= upper) {
 			for (i = lower; i < pos; i++) {
-				delta = i-nums[pos];
-				if (target_val-i < delta*pos || delta_sum+delta > pos) {
+				int delta = i+(i-nums[pos])*pos;
+				if (target_val < delta) {
 					break;
 				}
-				if (i == 0 || nums[i] <= upper_alt-i) {
-					nums[i]++;
-					inds[pos] = i;
-					selfdesc(pos-1, target_sum-i, target_val-i-delta*pos, delta_sum+delta);
-					nums[i]--;
-				}
+				choose_ind(pos, target_sum, target_val, i, delta);
 			}
-			delta_sum--;
-			delta = pos-nums[pos];
-			if (delta_sum+delta <= pos) {
-				if (nums[pos] < pos) {
-					nums[pos]++;
-					inds[pos] = pos;
-					selfdesc(pos-1, target_sum-pos, target_val-delta*pos, delta_sum+delta);
-					nums[pos]--;
-				}
-				for (i = pos+1; i <= upper; i++) {
-					delta = i-nums[pos];
-					if (delta_sum+delta > pos) {
-						break;
-					}
-					if (nums[i] < inds[i]) {
-						nums[i]++;
-						inds[pos] = i;
-						selfdesc(pos-1, target_sum-i, target_val-delta*pos, delta_sum+delta);
-						nums[i]--;
-					}
+			if (nums[pos] < pos) {
+				choose_ind(pos, target_sum, target_val, pos, (pos-nums[pos])*pos);
+			}
+			for (i = pos+1; i <= upper; i++) {
+				if (nums[i] < inds[i]) {
+					choose_ind(pos, target_sum, target_val, i, (i-nums[pos])*pos);
 				}
 			}
 		}
 		else {
-			delta_sum--;
 			for (i = lower; i <= upper; i++) {
-				delta = i-nums[pos];
-				if (delta_sum+delta > pos) {
-					break;
-				}
 				if (nums[i] < inds[i]) {
-					nums[i]++;
-					inds[pos] = i;
-					selfdesc(pos-1, target_sum-i, target_val-delta*pos, delta_sum+delta);
-					nums[i]--;
+					choose_ind(pos, target_sum, target_val, i, (i-nums[pos])*pos);
 				}
 			}
 		}
+		nums[0] = zeros;
 		return;
 	}
 	printf("Base %d [ %d", base, inds[0]);
@@ -142,4 +118,11 @@ void selfdesc(int pos, int target_sum, int target_val, int delta_sum) {
 	}
 	puts(" ]");
 	fflush(stdout);
+}
+
+void choose_ind(int pos, int target_sum, int target_val, int ind, int delta) {
+	nums[ind]++;
+	inds[pos] = ind;
+	selfdesc(pos-1, target_sum-ind, target_val-delta);
+	nums[ind]--;
 }
