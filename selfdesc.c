@@ -51,8 +51,9 @@ int main(int argc, char *argv[]) {
 void selfdesc(int pos, int target_sum, int target_val) {
 	int i;
 	if (pos >= 0) {
-		int zeros = nums[0], lower = nums[pos], upper, upper_alt;
+		int zeros = nums[0], lower = nums[pos], upper;
 		if (pos > 0) {
+			int upper_alt;
 			if (target_sum < base) {
 				while (pos > 2) {
 					nums[0]++;
